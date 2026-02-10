@@ -1,0 +1,46 @@
+feature:
+  slug: "<feature-slug>"                      # e.g. "improve-upload-speed"
+  title: "<short feature title>"
+  branch: "feat/<feature-slug>"               # use project AGENTS convention if different
+  status: "draft"                             # intake: draft -> approved; then in_progress|done during delivery
+  created_at: "<YYYY-MM-DDTHH:MM:SS+TZ>"      # e.g. "2026-02-06T12:00:00+01:00"
+  updated_at: "<YYYY-MM-DDTHH:MM:SS+TZ>"
+
+context:
+  problem_statement: >
+    <Describe the current problem clearly and concretely.>
+  goal: >
+    <Describe the desired outcome.>
+  success_signal: >
+    <Define how success is recognized/measured at a high level.>
+
+scope:
+  in_scope:
+    - "<item 1>"
+    - "<item 2>"
+  out_of_scope:
+    - "<item 1>"
+    - "<item 2>"
+
+acceptance_criteria:
+  - id: "AC-001"
+    title: "<criterion title>"
+    priority: "must"                          # must|should|could
+    given: "<initial context/state>"
+    when: "<trigger/action>"
+    then: "<expected outcome>"
+    verification:
+      type: "<test type>"                     # unit_test|integration_test|e2e_test|regression_test|manual_test
+      artifact: "<path/to/test-or-proof>"     # e.g. "tests/upload.integration.spec.ts"
+      notes: "<optional verification detail>"
+
+  - id: "AC-002"
+    title: "<criterion title>"
+    priority: "should"
+    given: "<initial context/state>"
+    when: "<trigger/action>"
+    then: "<expected outcome>"
+    verification:
+      type: "<test type>"
+      artifact: "<path/to/test-or-proof>"
+      notes: "<optional verification detail>"

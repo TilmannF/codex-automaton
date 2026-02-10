@@ -1,0 +1,42 @@
+feature_slug: "<feature-slug>"
+source_spec: ".work/<feature-slug>/spec.yaml"
+
+tasks:
+  - id: "T-001"
+    title: "<short task title>"
+    type: "test_red" # test_red|implementation|refactor|docs
+    status: "todo"   # todo|in_progress|done|blocked
+    maps_to:
+      - "AC-001" # must reference acceptance_criteria[].id in .work/<feature-slug>/spec.yaml
+    depends_on: []
+    files:
+      - "<path/to/file.ext>"
+    instructions:
+      - "<Concrete instruction 1>"
+      - "<Concrete instruction 2>"
+      - "<Concrete instruction 3>"
+    expected_failure:
+      - "<Why this red-phase task should fail before implementation>"
+    definition_of_done:
+      - "<Objective completion criterion 1>"
+      - "<Objective completion criterion 2>"
+
+  - id: "T-002"
+    title: "<short task title>"
+    type: "implementation"
+    status: "todo"
+    maps_to:
+      - "AC-001" # must reference acceptance_criteria[].id in .work/<feature-slug>/spec.yaml
+    depends_on:
+      - "T-001"
+    files:
+      - "<path/to/file.ext>"
+    instructions:
+      - "<Concrete implementation instruction 1>"
+      - "<Concrete implementation instruction 2>"
+    definition_of_done:
+      - "<Objective completion criterion>"
+
+execution:
+  strategy: "implement-next-task"
+  selection_rule: "pick first todo task whose dependencies are done"
