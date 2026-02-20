@@ -27,6 +27,8 @@ Create a minimal `tasks.yaml` that can drive implement-next-task loops.
   - `.codex/contracts/tasks-contract.md`
 - Validate approved spec before planning:
   - `./.codex/skills/feature-intake/scripts/validate-spec.sh --require-approved .work/<slug>/spec.yaml`
+- Validate tasks artifact after writing:
+  - `./.codex/skills/feature-planning/scripts/validate-tasks.sh --spec .work/<slug>/spec.yaml --require-selectable .work/<slug>/tasks.yaml`
 
 ## Inputs
 - `.work/<slug>/spec.yaml`
@@ -45,10 +47,9 @@ Create a minimal `tasks.yaml` that can drive implement-next-task loops.
 8. Ensure each `maps_to` entry references an existing `acceptance_criteria[].id`.
 9. Add `execution` block for deterministic selection.
 10. Persist `.work/<slug>/tasks.yaml` on disk.
-11. Verify planning consistency on disk:
-   - `tasks` is non-empty
-   - at least one selectable `todo` task exists or blockers are explicit
-   - all `maps_to` values reference existing AC IDs from spec
+11. Run tasks validator on disk:
+   - `./.codex/skills/feature-planning/scripts/validate-tasks.sh --spec .work/<slug>/spec.yaml --require-selectable .work/<slug>/tasks.yaml`
+12. If tasks validation fails, stop and surface errors.
 
 ## Plan mode handoff (mandatory when planning was run in Plan mode)
 1. If current mode cannot write files, output `handoff required` and stop:
@@ -56,10 +57,11 @@ Create a minimal `tasks.yaml` that can drive implement-next-task loops.
    - include requirement that implementation must not start yet
 2. Switch to an execution-capable mode that can write files.
 3. Persist the finalized `.work/<slug>/tasks.yaml` on disk.
-4. Re-run planning consistency checks on disk.
+4. Re-run tasks validator on disk:
+   - `./.codex/skills/feature-planning/scripts/validate-tasks.sh --spec .work/<slug>/spec.yaml --require-selectable .work/<slug>/tasks.yaml`
 5. Report handoff evidence:
    - tasks path
-   - planning consistency result
+   - tasks validation result
 6. If handoff cannot be executed, explicitly report that planning is not completed yet and stop.
 
 ## Output
@@ -70,7 +72,7 @@ Create a minimal `tasks.yaml` that can drive implement-next-task loops.
 - Every task has actionable `instructions`
 - Every task `maps_to` references existing AC IDs from spec
 - Dependencies are coherent
-- At least one selectable `todo` task exists (or blockers are explicit)
+- Tasks validator passed with `--spec` and `--require-selectable`
 - No implicit transition to implementation in the same step unless user explicitly requested it
 - If Plan mode was used, Plan mode handoff executed successfully and validated on-disk `tasks.yaml`
 - Active skill gate respected (no implicit jump to implementation)

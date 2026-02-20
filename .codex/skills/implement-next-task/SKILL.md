@@ -23,6 +23,8 @@ Run one incremental delivery cycle safely and predictably.
   - `.codex/contracts/tasks-contract.md`
 - Validate approved spec before task selection:
   - `./.codex/skills/feature-intake/scripts/validate-spec.sh --require-approved .work/<slug>/spec.yaml`
+- Validate tasks before task selection:
+  - `./.codex/skills/feature-planning/scripts/validate-tasks.sh --spec .work/<slug>/spec.yaml .work/<slug>/tasks.yaml`
 
 ## Inputs
 - `.work/<slug>/tasks.yaml`
@@ -35,8 +37,7 @@ Pick the first `todo` task whose `depends_on` are all `done`.
 ## Execution rules
 - Verify `.work/<slug>/tasks.yaml` exists before selecting/executing a task. If missing, stop.
 - Run spec validator with `--require-approved` before selecting/executing a task. If it fails, stop.
-- Before executing selected task, verify all `maps_to` IDs exist in `spec.yaml`.
-- If `maps_to` is invalid, mark selected task `blocked` with reason and stop.
+- Run tasks validator with `--spec` before selecting/executing a task. If it fails, stop.
 - Execute exactly one task.
 - Respect task `type`:
     - `test_red`: only create failing test + related scaffolding; no full feature fix.

@@ -14,6 +14,8 @@ Turn feedback into durable artifacts and update plan safely.
   - `.codex/contracts/tasks-contract.md`
 - Validate spec before processing feedback:
   - `./.codex/skills/feature-intake/scripts/validate-spec.sh .work/<slug>/spec.yaml`
+- Validate tasks after reconciliation:
+  - `./.codex/skills/feature-planning/scripts/validate-tasks.sh --spec .work/<slug>/spec.yaml .work/<slug>/tasks.yaml`
 
 ## Inputs
 - User feedback text
@@ -34,7 +36,8 @@ Turn feedback into durable artifacts and update plan safely.
     - adjust dependencies
     - keep history stable (do not rewrite completed tasks)
     - ensure `maps_to` only references existing `acceptance_criteria[].id`
-7. Identify next selectable task.
+7. Run tasks validator with `--spec`. If it fails, stop and surface errors.
+8. Identify next selectable task.
 
 ## Output
 - feedback file
