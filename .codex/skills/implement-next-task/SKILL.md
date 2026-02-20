@@ -18,7 +18,9 @@ Run one incremental delivery cycle safely and predictably.
 - If any precondition fails, stop and report blockers; do not execute tasks.
 
 ## Contract dependency
-- Read and follow `.codex/contracts/spec-contract.md`.
+- Read and follow:
+  - `.codex/contracts/spec-contract.md`
+  - `.codex/contracts/tasks-contract.md`
 - Validate approved spec before task selection:
   - `./.codex/skills/feature-intake/scripts/validate-spec.sh --require-approved .work/<slug>/spec.yaml`
 

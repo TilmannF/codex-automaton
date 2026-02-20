@@ -37,12 +37,6 @@ For planning preflight:
 2. If intake ran in Plan mode and files cannot be written, intake must output `handoff required` and stop.
 3. While active skill is intake, phrase "implement this plan" means persist and validate intake artifact, not production code implementation.
 
-## Planning artifact-first contract
-1. Planning completion requires on-disk `.work/<slug>/tasks.yaml`.
-2. If planning ran in Plan mode and files cannot be written, planning must output `handoff required` and stop.
-3. While active skill is planning, phrase "implement this plan" means persist and validate planning artifacts, not production code implementation.
-
-## AC ID mapping contract
-1. Source AC IDs come from `.work/<slug>/spec.yaml` at `acceptance_criteria[].id`.
-2. `tasks.yaml` entries in `tasks[].maps_to[]` must reference existing AC IDs.
-3. If a referenced AC ID is missing, task generation/execution must stop and report a blocker.
+## Tasks contract handoff
+All `tasks.yaml` schema, lifecycle, selection, and AC-mapping rules are defined in:
+- `.codex/contracts/tasks-contract.md`

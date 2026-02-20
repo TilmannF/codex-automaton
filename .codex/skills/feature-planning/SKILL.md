@@ -22,7 +22,9 @@ Create a minimal `tasks.yaml` that can drive implement-next-task loops.
 - If preconditions fail, stop and report blockers; do not generate `tasks.yaml`.
 
 ## Contract dependency
-- Read and follow `.codex/contracts/spec-contract.md`.
+- Read and follow:
+  - `.codex/contracts/spec-contract.md`
+  - `.codex/contracts/tasks-contract.md`
 - Validate approved spec before planning:
   - `./.codex/skills/feature-intake/scripts/validate-spec.sh --require-approved .work/<slug>/spec.yaml`
 
