@@ -9,7 +9,9 @@ description: Capture user feedback into timestamped artifact and reconcile spec/
 Turn feedback into durable artifacts and update plan safely.
 
 ## Contract dependency
-- Read and follow `.codex/contracts/spec-contract.md`.
+- Read and follow:
+  - `.codex/contracts/spec-contract.md`
+  - `.codex/contracts/tasks-contract.md`
 - Validate spec before processing feedback:
   - `./.codex/skills/feature-intake/scripts/validate-spec.sh .work/<slug>/spec.yaml`
 

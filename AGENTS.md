@@ -25,6 +25,8 @@ This repository defines and evolves that framework.
 - `.codex/skills/feature-planning/assets/tasks.yaml`
 - `.codex/skills/implement-next-task/SKILL.md`
 - `.codex/skills/feature-feedback/SKILL.md`
+- `.codex/contracts/spec-contract.md`
+- `.codex/contracts/tasks-contract.md`
 - `.codex/AGENTS.md` (runtime/system-wide file to be installed on device)
 - `README.md`
 
@@ -56,6 +58,8 @@ Any change touching one of these must check the others:
 - `feature-intake` <-> `assets/spec.yaml`
 - `feature-planning` <-> `assets/tasks.yaml`
 - `implement-next-task` <-> task status/type/dependency conventions
+- `spec-contract.md` <-> `feature-intake` spec validation/status rules
+- `tasks-contract.md` <-> planning/implementation/feedback task rules
 - `README.md` <-> actual repository layout and install flow
 
 ## Definition of done for repository changes

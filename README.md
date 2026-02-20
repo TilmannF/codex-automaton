@@ -71,17 +71,20 @@ Do not treat these as interchangeable.
 - `.codex/skills/implement-next-task/SKILL.md`
 - `.codex/skills/feature-feedback/SKILL.md`
 - `.codex/contracts/spec-contract.md`
+- `.codex/contracts/tasks-contract.md`
 - `.codex/AGENTS.md`
 - `AGENTS.md`
 
-## Spec contract
+## Contracts
 
-Cross-skill schema behavior is centralized in:
+Cross-skill artifact behavior is centralized in:
 - `.codex/contracts/spec-contract.md`
+- `.codex/contracts/tasks-contract.md`
 
-All workflow skills should use:
+Artifact responsibility split:
 - `.codex/skills/feature-intake/assets/spec.yaml` as canonical schema template
 - `.codex/skills/feature-intake/scripts/validate-spec.sh` as the validation gate
+- `.codex/skills/feature-planning/assets/tasks.yaml` as canonical task schema template
 
 ## How engineers should use this kit (today)
 
