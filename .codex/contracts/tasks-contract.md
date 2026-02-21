@@ -33,6 +33,7 @@ Planning strict selectability validation:
 3. Run `validate-tasks.sh` before consuming `tasks.yaml`.
 4. If a skill edits `tasks.yaml`, re-run `validate-tasks.sh` before proceeding.
 5. If artifact is missing or consistency checks fail, stop and surface errors; do not continue silently.
+6. Skills that both consume and edit `tasks.yaml` (for example feedback reconciliation) must validate both before consuming and after edits are applied.
 
 ## Task schema contract
 1. Top-level fields are:
