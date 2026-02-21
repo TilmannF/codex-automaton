@@ -229,8 +229,8 @@ mark_visited() {
 find_task_index_by_id() {
   local id="$1"
   local idx
-  for ((idx = 0; idx < tasks_len; idx++)); do
-    if [[ "${task_ids[$idx]}" == "$id" ]]; then
+  for idx in "${!task_ids[@]}"; do
+    if [[ "${task_ids[$idx]-}" == "$id" ]]; then
       printf '%s' "$idx"
       return 0
     fi
@@ -245,7 +245,7 @@ status_for_task_id() {
   if [[ -z "${idx//[[:space:]]/}" ]]; then
     return 1
   fi
-  printf '%s' "${task_statuses[$idx]}"
+  printf '%s' "${task_statuses[$idx]-}"
   return 0
 }
 
@@ -356,8 +356,10 @@ if [[ "$tasks_len" =~ ^[0-9]+$ ]] && (( tasks_len > 0 )); then
     esac
 
     task_status="$(yq_tasks ".tasks[$i].status // \"\"")"
-    task_ids[$i]="$task_id"
-    task_statuses[$i]="$task_status"
+    if is_task_id "$task_id"; then
+      task_ids[$i]="$task_id"
+      task_statuses[$i]="$task_status"
+    fi
     case "$task_status" in
       todo|in_progress|done|blocked) ;;
       *) add_error "$prefix.status must be one of: todo, in_progress, done, blocked" ;;
