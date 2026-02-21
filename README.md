@@ -66,8 +66,10 @@ Do not treat these as interchangeable.
 
 - `.codex/skills/feature-intake/SKILL.md`
 - `.codex/skills/feature-intake/assets/spec.yaml`
+- `.codex/skills/feature-intake/scripts/validate-spec.sh`
 - `.codex/skills/feature-planning/SKILL.md`
 - `.codex/skills/feature-planning/assets/tasks.yaml`
+- `.codex/skills/feature-planning/scripts/validate-tasks.sh`
 - `.codex/skills/implement-next-task/SKILL.md`
 - `.codex/skills/feature-feedback/SKILL.md`
 - `.codex/contracts/spec-contract.md`
@@ -85,6 +87,7 @@ Artifact responsibility split:
 - `.codex/skills/feature-intake/assets/spec.yaml` as canonical schema template
 - `.codex/skills/feature-intake/scripts/validate-spec.sh` as the validation gate
 - `.codex/skills/feature-planning/assets/tasks.yaml` as canonical task schema template
+- `.codex/skills/feature-planning/scripts/validate-tasks.sh` as the task validation gate
 
 ## How engineers should use this kit (today)
 

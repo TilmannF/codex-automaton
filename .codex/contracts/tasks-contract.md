@@ -2,8 +2,25 @@
 
 This document defines the canonical `tasks.yaml` contract for planning, execution, and feedback workflow skills.
 
-## Canonical source
+## Canonical sources
 - Schema template: `.codex/skills/feature-planning/assets/tasks.yaml`
+- Validator script: `.codex/skills/feature-planning/scripts/validate-tasks.sh`
+
+## Required validation commands
+General schema/graph validation:
+```bash
+./.codex/skills/feature-planning/scripts/validate-tasks.sh .work/<slug>/tasks.yaml
+```
+
+Cross-file AC mapping validation:
+```bash
+./.codex/skills/feature-planning/scripts/validate-tasks.sh --spec .work/<slug>/spec.yaml .work/<slug>/tasks.yaml
+```
+
+Planning strict selectability validation:
+```bash
+./.codex/skills/feature-planning/scripts/validate-tasks.sh --spec .work/<slug>/spec.yaml --require-selectable .work/<slug>/tasks.yaml
+```
 
 ## Planning artifact-first contract
 1. Planning completion requires on-disk `.work/<slug>/tasks.yaml`.
@@ -13,8 +30,10 @@ This document defines the canonical `tasks.yaml` contract for planning, executio
 ## Required behavior across skills
 1. Ensure required tasks artifact exists on disk before consuming it.
 2. Ensure source spec exists and passes the required validation gate for the current phase.
-3. If a skill edits `tasks.yaml`, re-check task consistency before proceeding.
-4. If artifact is missing or consistency checks fail, stop and surface errors; do not continue silently.
+3. Run `validate-tasks.sh` before consuming `tasks.yaml`.
+4. If a skill edits `tasks.yaml`, re-run `validate-tasks.sh` before proceeding.
+5. If artifact is missing or consistency checks fail, stop and surface errors; do not continue silently.
+6. Skills that both consume and edit `tasks.yaml` (for example feedback reconciliation) must validate both before consuming and after edits are applied.
 
 ## Task schema contract
 1. Top-level fields are:
@@ -33,10 +52,15 @@ This document defines the canonical `tasks.yaml` contract for planning, executio
    - `instructions`
    - optional: `expected_failure`
    - `definition_of_done`
-3. `type` must be one of: `test_red`, `implementation`, `refactor`, `docs`.
-4. `status` must be one of: `todo`, `in_progress`, `done`, `blocked`.
-5. `execution.strategy` must be `implement-next-task`.
-6. `execution.selection_rule` must reflect deterministic first-selectable-task behavior.
+3. `id` must match `T-###` and be unique.
+4. `type` must be one of: `test_red`, `implementation`, `refactor`, `docs`.
+5. `status` must be one of: `todo`, `in_progress`, `done`, `blocked`.
+6. `execution.strategy` must be `implement-next-task`.
+7. `execution.selection_rule` must be exactly `pick first todo task whose dependencies are done`.
+8. `maps_to`, `files`, `instructions`, and `definition_of_done` must be non-empty string lists.
+9. `depends_on` must be a list.
+10. If present, `expected_failure` must be a non-empty string list.
+11. Fields defined as strings (for example `feature_slug`, `source_spec`, and task `title`) must be YAML strings, not non-string scalars or objects.
 
 ## Task lifecycle and execution contract
 1. New tasks should start in `todo` unless explicitly preserved history requires otherwise.
@@ -47,23 +71,24 @@ This document defines the canonical `tasks.yaml` contract for planning, executio
 
 ## Dependency and selectability contract
 1. `depends_on` values must reference existing `tasks[].id` values.
-2. A task is selectable when:
+2. Self-dependencies are invalid.
+3. Dependency cycles are invalid.
+4. A task is selectable when:
    - `status` is `todo`
    - all `depends_on` tasks are `done`
-3. Next-task selection rule is: pick the first selectable `todo` task.
-4. If no task is selectable, report blockers and stop.
+5. Next-task selection rule is: pick the first selectable `todo` task.
+6. Planning strictness (`--require-selectable`) requires at least one selectable `todo` task.
+7. If no task is selectable in a phase that requires selection, report blockers and stop.
 
 ## AC ID mapping contract
 1. Source AC IDs come from `.work/<slug>/spec.yaml` at `acceptance_criteria[].id`.
-2. `tasks.yaml` entries in `tasks[].maps_to[]` must reference existing AC IDs.
+2. `tasks.yaml` entries in `tasks[].maps_to[]` must reference existing AC IDs when validator is run with `--spec`.
 3. If a referenced AC ID is missing, task generation/reconciliation/execution must stop and report a blocker.
+4. When run with `--spec`, `feature_slug` must match `spec.feature.slug`.
 
 ## Planning consistency checks
-1. `tasks` is non-empty.
-2. At least one selectable `todo` task exists, or blockers are explicit.
-3. All `maps_to` values reference existing AC IDs from spec.
-4. Dependency graph references only existing task IDs.
-
-## Validation note
-There is no standalone `tasks.yaml` validator script in this repository.
-Contract enforcement is performed through planning, execution, and feedback skill checks.
+1. Run validator with `--spec` and `--require-selectable`.
+2. `tasks` is non-empty.
+3. At least one selectable `todo` task exists.
+4. All `maps_to` values reference existing AC IDs from spec.
+5. Dependency graph references only existing task IDs and has no cycles.

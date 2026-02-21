@@ -21,8 +21,10 @@ This repository defines and evolves that framework.
 ## Current repository structure (authoritative)
 - `.codex/skills/feature-intake/SKILL.md`
 - `.codex/skills/feature-intake/assets/spec.yaml`
+- `.codex/skills/feature-intake/scripts/validate-spec.sh`
 - `.codex/skills/feature-planning/SKILL.md`
 - `.codex/skills/feature-planning/assets/tasks.yaml`
+- `.codex/skills/feature-planning/scripts/validate-tasks.sh`
 - `.codex/skills/implement-next-task/SKILL.md`
 - `.codex/skills/feature-feedback/SKILL.md`
 - `.codex/contracts/spec-contract.md`
@@ -56,7 +58,9 @@ This repository defines and evolves that framework.
 ## Consistency contract
 Any change touching one of these must check the others:
 - `feature-intake` <-> `assets/spec.yaml`
+- `feature-intake` <-> `scripts/validate-spec.sh`
 - `feature-planning` <-> `assets/tasks.yaml`
+- `feature-planning` <-> `scripts/validate-tasks.sh`
 - `implement-next-task` <-> task status/type/dependency conventions
 - `spec-contract.md` <-> `feature-intake` spec validation/status rules
 - `tasks-contract.md` <-> planning/implementation/feedback task rules

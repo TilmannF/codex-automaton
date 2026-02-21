@@ -102,11 +102,52 @@ require_list() {
 require_non_empty_string() {
   local path="$1"
   local label="$2"
+  local t
   local value
+
+  t="$(yq_value "$path | type")"
+  if [[ "$t" != "!!str" ]]; then
+    add_error "$label must be a non-empty string"
+    return
+  fi
+
   value="$(yq_value "$path // \"\"")"
   if [[ -z "${value//[[:space:]]/}" ]]; then
     add_error "$label must be a non-empty string"
   fi
+}
+
+validate_non_empty_string_list() {
+  local path="$1"
+  local label="$2"
+  local t
+  local len
+  local item
+  local i
+
+  t="$(yq_value "$path | type")"
+  if [[ "$t" != "!!seq" ]]; then
+    add_error "$label must be a non-empty string list"
+    return
+  fi
+
+  len="$(yq_value "$path | length")"
+  if [[ ! "$len" =~ ^[0-9]+$ ]] || (( len == 0 )); then
+    add_error "$label must be a non-empty string list"
+    return
+  fi
+
+  for ((i = 0; i < len; i++)); do
+    t="$(yq_value "$path[$i] | type")"
+    if [[ "$t" != "!!str" ]]; then
+      add_error "$label[$i] must be a non-empty string"
+      continue
+    fi
+    item="$(yq_value "$path[$i] // \"\"")"
+    if [[ -z "${item//[[:space:]]/}" ]]; then
+      add_error "$label[$i] must be a non-empty string"
+    fi
+  done
 }
 
 for key in feature context scope acceptance_criteria; do
@@ -136,8 +177,8 @@ require_non_empty_string ".context.problem_statement" "context.problem_statement
 require_non_empty_string ".context.goal" "context.goal"
 require_non_empty_string ".context.success_signal" "context.success_signal"
 
-require_list ".scope.in_scope" "scope.in_scope"
-require_list ".scope.out_of_scope" "scope.out_of_scope"
+validate_non_empty_string_list ".scope.in_scope" "scope.in_scope"
+validate_non_empty_string_list ".scope.out_of_scope" "scope.out_of_scope"
 
 ac_type="$(yq_value ".acceptance_criteria | type")"
 if [[ "$ac_type" != "!!seq" ]]; then
