@@ -156,60 +156,98 @@ validate_non_empty_string_list() {
 set_has_value() {
   local set="$1"
   local value="$2"
-  [[ "$set" == *$'\n'"$value"$'\n'* ]]
+  printf '%s' "$set" | grep -F -x -q -- "$value"
 }
 
-id_to_key() {
+remove_from_set() {
+  local set="$1"
+  local id="$2"
+  local line
+  local out
+
+  out=$'\n'
+  while IFS= read -r line; do
+    if [[ -z "${line//[[:space:]]/}" ]]; then
+      continue
+    fi
+    if [[ "$line" == "$id" ]]; then
+      continue
+    fi
+    out+="$line"$'\n'
+  done <<< "$set"
+
+  printf '%s' "$out"
+}
+
+is_visiting() {
   local id="$1"
-  printf '%s' "${id//-/_}"
+  set_has_value "$visiting_ids" "$id"
 }
 
-get_state() {
-  local key="$1"
-  eval "printf '%s' \"\${state_${key}:-0}\""
+is_visited() {
+  local id="$1"
+  set_has_value "$visited_ids" "$id"
 }
 
-set_state() {
-  local key="$1"
-  local value="$2"
-  eval "state_${key}=\"$value\""
+mark_visiting() {
+  local id="$1"
+  if ! is_visiting "$id"; then
+    visiting_ids+="$id"$'\n'
+  fi
+}
+
+unmark_visiting() {
+  local id="$1"
+  visiting_ids="$(remove_from_set "$visiting_ids" "$id")"
+}
+
+mark_visited() {
+  local id="$1"
+  if ! is_visited "$id"; then
+    visited_ids+="$id"$'\n'
+  fi
 }
 
 dfs_visit() {
   local id="$1"
-  local state
-  local key
   local deps_len
   local dep
   local i
 
-  key="$(id_to_key "$id")"
-  state="$(get_state "$key")"
+  if [[ ! "$id" =~ ^T-[0-9]{3}$ ]]; then
+    return 0
+  fi
 
-  if [[ "$state" == "1" ]]; then
+  if ! set_has_value "$seen_task_ids" "$id"; then
+    return 0
+  fi
+
+  if is_visiting "$id"; then
     if [[ "$cycle_reported" != "true" ]]; then
       add_error "Dependency cycle detected in tasks graph (example at $id)"
       cycle_reported="true"
     fi
     return 1
   fi
-  if [[ "$state" == "2" ]]; then
+
+  if is_visited "$id"; then
     return 0
   fi
 
-  set_state "$key" "1"
+  mark_visiting "$id"
 
   deps_len="$(yq_tasks ".tasks[] | select(.id == \"$id\") | .depends_on | length")"
   if [[ "$deps_len" =~ ^[0-9]+$ ]]; then
     for ((i = 0; i < deps_len; i++)); do
       dep="$(yq_tasks ".tasks[] | select(.id == \"$id\") | .depends_on[$i] // \"\"")"
-      if [[ -n "${dep//[[:space:]]/}" ]]; then
+      if [[ -n "${dep//[[:space:]]/}" ]] && [[ "$dep" =~ ^T-[0-9]{3}$ ]] && set_has_value "$seen_task_ids" "$dep"; then
         dfs_visit "$dep" || true
       fi
     done
   fi
 
-  set_state "$key" "2"
+  unmark_visiting "$id"
+  mark_visited "$id"
   return 0
 }
 
@@ -244,6 +282,8 @@ if [[ "$execution_selection_rule" != "pick first todo task whose dependencies ar
 fi
 
 seen_task_ids=$'\n'
+visiting_ids=$'\n'
+visited_ids=$'\n'
 
 if [[ "$tasks_len" =~ ^[0-9]+$ ]] && (( tasks_len > 0 )); then
   for ((i = 0; i < tasks_len; i++)); do
