@@ -59,6 +59,7 @@ Planning strict selectability validation:
 8. `maps_to`, `files`, `instructions`, and `definition_of_done` must be non-empty string lists.
 9. `depends_on` must be a list.
 10. If present, `expected_failure` must be a non-empty string list.
+11. Fields defined as strings (for example `feature_slug`, `source_spec`, and task `title`) must be YAML strings, not non-string scalars or objects.
 
 ## Task lifecycle and execution contract
 1. New tasks should start in `todo` unless explicitly preserved history requires otherwise.

@@ -27,6 +27,10 @@ For planning preflight:
 3. If a skill edits `spec.yaml`, re-run validation before proceeding.
 4. If artifact is missing or validation fails, stop and surface errors; do not continue silently.
 
+## Type strictness contract
+1. Fields defined as strings in `spec.yaml` must be YAML strings (not coercible non-string scalars or objects).
+2. `scope.in_scope` and `scope.out_of_scope` must be non-empty string lists.
+
 ## Status lifecycle contract
 1. Intake works in `feature.status: draft` during refinement.
 2. After user approval, intake must set `feature.status: approved`.

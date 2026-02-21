@@ -96,6 +96,11 @@ yq_spec() {
   "$YQ_BIN" eval -r "$expr" "$spec_path" 2>/dev/null
 }
 
+is_task_id() {
+  local value="$1"
+  [[ "$value" =~ ^T-[0-9]{3}$ ]]
+}
+
 require_top_key() {
   local key="$1"
   local exists
@@ -118,7 +123,15 @@ require_map() {
 require_non_empty_string() {
   local path="$1"
   local label="$2"
+  local t
   local value
+
+  t="$(yq_tasks "$path | type")"
+  if [[ "$t" != "!!str" ]]; then
+    add_error "$label must be a non-empty string"
+    return
+  fi
+
   value="$(yq_tasks "$path // \"\"")"
   if [[ -z "${value//[[:space:]]/}" ]]; then
     add_error "$label must be a non-empty string"
@@ -146,6 +159,11 @@ validate_non_empty_string_list() {
   fi
 
   for ((i = 0; i < len; i++)); do
+    t="$(yq_tasks "$path[$i] | type")"
+    if [[ "$t" != "!!str" ]]; then
+      add_error "$label[$i] must be a non-empty string"
+      continue
+    fi
     item="$(yq_tasks "$path[$i] // \"\"")"
     if [[ -z "${item//[[:space:]]/}" ]]; then
       add_error "$label[$i] must be a non-empty string"
@@ -208,13 +226,36 @@ mark_visited() {
   fi
 }
 
+find_task_index_by_id() {
+  local id="$1"
+  local idx
+  for ((idx = 0; idx < tasks_len; idx++)); do
+    if [[ "${task_ids[$idx]}" == "$id" ]]; then
+      printf '%s' "$idx"
+      return 0
+    fi
+  done
+  return 1
+}
+
+status_for_task_id() {
+  local id="$1"
+  local idx
+  idx="$(find_task_index_by_id "$id" || true)"
+  if [[ -z "${idx//[[:space:]]/}" ]]; then
+    return 1
+  fi
+  printf '%s' "${task_statuses[$idx]}"
+  return 0
+}
+
 dfs_visit() {
   local id="$1"
   local deps_len
   local dep
   local i
 
-  if [[ ! "$id" =~ ^T-[0-9]{3}$ ]]; then
+  if ! is_task_id "$id"; then
     return 0
   fi
 
@@ -240,7 +281,7 @@ dfs_visit() {
   if [[ "$deps_len" =~ ^[0-9]+$ ]]; then
     for ((i = 0; i < deps_len; i++)); do
       dep="$(yq_tasks ".tasks[] | select(.id == \"$id\") | .depends_on[$i] // \"\"")"
-      if [[ -n "${dep//[[:space:]]/}" ]] && [[ "$dep" =~ ^T-[0-9]{3}$ ]] && set_has_value "$seen_task_ids" "$dep"; then
+      if [[ -n "${dep//[[:space:]]/}" ]] && is_task_id "$dep" && set_has_value "$seen_task_ids" "$dep"; then
         dfs_visit "$dep" || true
       fi
     done
@@ -284,6 +325,8 @@ fi
 seen_task_ids=$'\n'
 visiting_ids=$'\n'
 visited_ids=$'\n'
+task_ids=()
+task_statuses=()
 
 if [[ "$tasks_len" =~ ^[0-9]+$ ]] && (( tasks_len > 0 )); then
   for ((i = 0; i < tasks_len; i++)); do
@@ -296,7 +339,7 @@ if [[ "$tasks_len" =~ ^[0-9]+$ ]] && (( tasks_len > 0 )); then
     fi
 
     task_id="$(yq_tasks ".tasks[$i].id // \"\"")"
-    if [[ ! "$task_id" =~ ^T-[0-9]{3}$ ]]; then
+    if ! is_task_id "$task_id"; then
       add_error "$prefix.id must match T-### (for example: T-001)"
     elif set_has_value "$seen_task_ids" "$task_id"; then
       add_error "$prefix.id duplicates $task_id"
@@ -313,6 +356,8 @@ if [[ "$tasks_len" =~ ^[0-9]+$ ]] && (( tasks_len > 0 )); then
     esac
 
     task_status="$(yq_tasks ".tasks[$i].status // \"\"")"
+    task_ids[$i]="$task_id"
+    task_statuses[$i]="$task_status"
     case "$task_status" in
       todo|in_progress|done|blocked) ;;
       *) add_error "$prefix.status must be one of: todo, in_progress, done, blocked" ;;
@@ -358,7 +403,7 @@ if [[ "$tasks_len" =~ ^[0-9]+$ ]] && (( tasks_len > 0 )); then
 
   for ((i = 0; i < tasks_len; i++)); do
     task_id="$(yq_tasks ".tasks[$i].id // \"\"")"
-    if [[ "$task_id" =~ ^T-[0-9]{3}$ ]]; then
+    if is_task_id "$task_id"; then
       dfs_visit "$task_id" || true
     fi
   done
@@ -414,7 +459,10 @@ if [[ "$tasks_len" =~ ^[0-9]+$ ]] && (( tasks_len > 0 )); then
       if [[ "$depends_len" =~ ^[0-9]+$ ]]; then
         for ((j = 0; j < depends_len; j++)); do
           dep_id="$(yq_tasks ".tasks[$i].depends_on[$j] // \"\"")"
-          dep_status="$(yq_tasks ".tasks[] | select(.id == \"$dep_id\") | .status // \"\"")"
+          dep_status=""
+          if [[ -n "${dep_id//[[:space:]]/}" ]] && is_task_id "$dep_id" && set_has_value "$seen_task_ids" "$dep_id"; then
+            dep_status="$(status_for_task_id "$dep_id" || true)"
+          fi
           if [[ "$dep_status" != "done" ]]; then
             deps_done="false"
             break
