@@ -10,16 +10,16 @@ Thanks for helping improve the project.
 
 ## I Have a Question
 - Check `README.md` and `AGENTS.md` first.
-- Search existing [issues](/issues).
-- If still unclear, open a new [issue](/issues/new) with context and your goal.
+- Search existing [issues](https://github.com/TilmannF/codex-automaton/issues).
+- If still unclear, open a new [issue](https://github.com/TilmannF/codex-automaton/issues/new) with context and your goal.
 
 ## Reporting Bugs
-- Open a [bug report](/issues/new).
+- Open a [bug report](https://github.com/TilmannF/codex-automaton/issues/new).
 - Include reproduction steps, expected behavior, actual behavior, and environment details.
 - If possible, include a minimal example.
 
 ## Suggesting Enhancements
-- Open a [feature request](/issues/new).
+- Open a [feature request](https://github.com/TilmannF/codex-automaton/issues/new).
 - Explain the problem, proposed change, and expected impact.
 - Link related issues or prior discussions when relevant.
 
