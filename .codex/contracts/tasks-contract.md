@@ -22,6 +22,11 @@ Planning strict selectability validation:
 ./.codex/skills/feature-planning/scripts/validate-tasks.sh --spec .work/<slug>/spec.yaml --require-selectable .work/<slug>/tasks.yaml
 ```
 
+## Exit code contract
+1. `0`: validation passed.
+2. `1`: validation failed (schema/graph/cross-file/selectability checks).
+3. `2`: usage/tool/file/YAML parse error.
+
 ## Planning artifact-first contract
 1. Planning completion requires on-disk `.work/<slug>/tasks.yaml`.
 2. If planning ran in Plan mode and files cannot be written, planning must output `handoff required` and stop.

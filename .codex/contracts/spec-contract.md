@@ -21,6 +21,11 @@ For planning preflight:
 ./.codex/skills/feature-intake/scripts/validate-spec.sh --require-approved .work/<slug>/spec.yaml
 ```
 
+## Exit code contract
+1. `0`: validation passed.
+2. `1`: validation failed (schema/content checks).
+3. `2`: usage/tool/file/YAML parse error.
+
 ## Required behavior across skills
 1. Ensure required artifact exists on disk before consuming it.
 2. Validate `spec.yaml` before consuming it.

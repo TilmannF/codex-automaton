@@ -54,6 +54,16 @@ This repository defines and evolves that framework.
 4. If changing template fields, update all affected skills and docs in the same change.
 5. Do not silently introduce project-specific assumptions into generic templates.
 6. Prefer small, focused commits and reviewable diffs.
+7. Use Conventional Commits for commit subjects.
+8. Keep each commit atomic and code-focused; include docs/contracts updates in the same change when behavior changes.
+9. Run relevant validators/tests before committing; do not weaken checks to pass.
+
+## Helper script quality gates
+1. Validation helper scripts must use stable exits: `0` pass, `1` validation fail, `2` usage/tool/file/parse error.
+2. Treat artifact input as untrusted: no `eval`; no unescaped query interpolation.
+3. Keep Bash `3.2` compatibility and avoid sparse-array failures under `set -u`.
+4. Enforce real YAML types for string/string-list fields (no scalar coercion).
+5. If helper script behavior changes, update contracts and README in the same change.
 
 ## Consistency contract
 Any change touching one of these must check the others:

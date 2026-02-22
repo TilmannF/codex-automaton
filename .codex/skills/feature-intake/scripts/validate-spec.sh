@@ -55,8 +55,8 @@ fi
 YQ_BIN="$(command -v yq)"
 
 if ! "$YQ_BIN" eval '.' "$spec_path" >/dev/null 2>&1; then
-  echo "FAIL: Invalid YAML in $spec_path" >&2
-  exit 1
+  echo "ERROR: Invalid YAML in $spec_path" >&2
+  exit 2
 fi
 
 errors=()
