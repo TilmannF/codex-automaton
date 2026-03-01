@@ -13,7 +13,11 @@ See:
 - `LICENSE`
 - `LICENSE-COMMERCIAL.md`
 
-## Setup (Important)
+## Setup
+
+This framework currently installs through a Bash-based setup script.
+
+### macOS / Linux
 
 Before starting Codex, run:
 
@@ -21,16 +25,56 @@ Before starting Codex, run:
 ./dev install
 ```
 
-This command is the official setup path for this framework. It:
-- checks required tools (`codex`, `yq`, `zip`)
-- creates a timestamped backup zip of existing framework files in `$CODEX_HOME`
-- installs this repository's `.codex` framework files into `$CODEX_HOME` (default: `~/.codex`)
-
 If needed, install into a custom location:
 
 ```bash
 CODEX_HOME=/path/to/custom/.codex ./dev install
 ```
+
+### Windows
+
+Windows is supported through **Git Bash**.
+
+Requirements:
+- Git for Windows, including the **Git Bash** application
+- `codex` available in Git Bash
+- `yq` available in Git Bash
+- `zip` available in Git Bash
+
+Before installing, verify the required tools from **Git Bash**:
+
+```bash
+command -v codex
+command -v yq
+command -v zip
+```
+
+Each command must print a path. If any command prints nothing, install that tool and restart Git Bash before continuing.
+
+Then run:
+
+```bash
+./dev install
+```
+
+If needed, install into a custom location:
+
+```bash
+export CODEX_HOME="$HOME/.codex"
+./dev install
+```
+
+Notes:
+- Run these commands from the **Git Bash application**, not PowerShell or Command Prompt.
+- On some Windows systems, `bash` may point to WSL instead of Git Bash. Opening the Git Bash app avoids that ambiguity.
+- The validation scripts in this repository are also Bash scripts and should be run from Git Bash on Windows.
+
+### What the installer does
+
+The installer:
+- checks required tools (`codex`, `yq`, `zip`)
+- creates a timestamped backup zip of existing framework files in `$CODEX_HOME`
+- installs this repository's `.codex` framework files into `$CODEX_HOME` (default: `~/.codex`)
 
 ## What this project is
 
@@ -91,7 +135,7 @@ Artifact responsibility split:
 
 ## How engineers should use this kit (today)
 
-1. Run `./dev install` (see Setup section above).
+1. Run the setup command from the platform-appropriate instructions above.
 2. In a target project, start a feature under `.work/<feature-slug>/`.
 3. Run the flow using the skills:
    - `feature-intake`
